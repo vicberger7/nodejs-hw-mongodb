@@ -5,7 +5,7 @@ import {
   deleteContactById,
   upsertContact,
 } from '../services/contacts.js';
-import { HttpError } from '../middlewares/errorHandlerMiddleware.js';
+import { isHttpError } from 'http-errors';
 
 export const getContactsController = async (req, res) => {
   const contacts = await getAllContacts();
@@ -69,13 +69,11 @@ export const deleteContactByIdController = async (req, res, next) => {
   const contact = await getContactById(id);
 
   if (!contact) {
-    next(HttpError(404, 'not found'));
+    next(isHttpError(404, 'not found'));
     return;
   }
 
   await deleteContactById(id);
-
-
 
   res.status(204).send();
 };
