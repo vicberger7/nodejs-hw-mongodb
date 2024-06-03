@@ -63,8 +63,18 @@ export const putContactController = async (req, res) => {
 };
 
 export const deleteContactByIdController = async (req, res) => {
-  const ID = req.params.contactId;
-  await deleteContactById(ID);
+  const id = req.params.contactId;
+
+  const contact = await getContactById(id);
+
+  if (!contact) {
+    res.status(404).send();
+    return;
+  }
+
+  await deleteContactById(id);
+
+  console.log(`Student with ID ${id} was successfully deleted`);
 
   res.status(204).send();
 };
