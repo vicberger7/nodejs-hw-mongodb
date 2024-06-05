@@ -4,8 +4,10 @@ import { Contact } from './db/models/contact.js';
 
 const bootstrap = async () => {
   await initMongoConnection();
-  const contacts = await Contact.find({});
-  console.log(contacts);
+
+  const contact = await Contact.find({});
+
+  console.log(contact);
   setupServer();
 };
 

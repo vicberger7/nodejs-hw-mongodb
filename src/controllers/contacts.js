@@ -5,6 +5,7 @@ import {
   deleteContactById,
   upsertContact,
 } from '../services/contacts.js';
+import { isHttpError } from 'http-errors';
 
 export const getContactsController = async (req, res) => {
   const contacts = await getAllContacts();
@@ -27,8 +28,7 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const createContactController = async (req, res) => {
-  const payload = req.body;
-  const newContact = await createContact(payload);
+  const newContact = await createContact(req.body);
 
   res.status(201).json({
     status: 201,
@@ -39,8 +39,7 @@ export const createContactController = async (req, res) => {
 
 export const patchContactController = async (req, res) => {
   const ID = req.params.contactId;
-  const payload = req;
-  const { contact } = await upsertContact(ID, payload);
+  const { contact } = await upsertContact(ID, req.body);
 
   res.status(200).json({
     status: 200,
@@ -51,8 +50,8 @@ export const patchContactController = async (req, res) => {
 
 export const putContactController = async (req, res) => {
   const ID = req.params.contactId;
-  const payload = req;
-  const { contact, isNew } = await upsertContact(ID, payload, {
+  const body = req.body;
+  const { contact, isNew } = await upsertContact(ID, body, {
     upsert: true,
   });
 
@@ -64,9 +63,17 @@ export const putContactController = async (req, res) => {
   });
 };
 
-export const deleteContactByIdController = async (req, res) => {
-  const ID = req.params.contactId;
-  await deleteContactById(ID);
+export const deleteContactByIdController = async (req, res, next) => {
+  const id = req.params.contactId;
+
+  const contact = await getContactById(id);
+
+  if (!contact) {
+    next(isHttpError(404, 'not found'));
+    return;
+  }
+
+  await deleteContactById(id);
 
   res.status(204).send();
 };

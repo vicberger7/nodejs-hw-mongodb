@@ -20,12 +20,14 @@ export const createContact = async (payload) => {
   return await newContact.save();
 };
 
-export const upsertContact = async (ID, payload, options = {}) => {
-  const rawResult = await Contact.findByIdAndUpdate(ID, payload, {
+export const upsertContact = async (ID, body, options = {}) => {
+  console.log(body);
+  const rawResult = await Contact.findByIdAndUpdate(ID, body, {
     new: true,
     includeResultMetadata: true,
     ...options,
   });
+  console.log(rawResult);
 
   if (!rawResult || !rawResult.value) {
     throw createHttpError(404, 'Contact not found');
