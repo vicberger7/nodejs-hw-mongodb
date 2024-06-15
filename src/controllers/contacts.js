@@ -11,9 +11,12 @@ import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilters } from '../utils/parseFilters.js';
 
 export const getContactsController = async (req, res) => {
+  const userId = req.user._id;
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
   const filter = parseFilters(req.query);
+
+  filter.userId = userId;
 
   const contacts = await getAllContacts({
     page,
@@ -31,8 +34,14 @@ export const getContactsController = async (req, res) => {
 };
 
 export const getContactByIdController = async (req, res) => {
+  const userId = req.user._id;
   const ID = req.params.contactId;
-  const contact = await getContactById(ID);
+
+  const contact = await getContactById({ _id: ID, userId });
+
+  if (!contact) {
+    return res.status(404).json({ status: 404, message: 'Contact not found' });
+  }
 
   res.json({
     status: 200,
@@ -42,7 +51,10 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const createContactController = async (req, res) => {
-  const newContact = await createContact(req.body);
+  const userId = req.user._id;
+
+  const newContactData = { ...req.body, userId };
+  const newContact = await createContact(newContactData);
 
   res.status(201).json({
     status: 201,
@@ -52,8 +64,14 @@ export const createContactController = async (req, res) => {
 };
 
 export const patchContactController = async (req, res) => {
+  const userId = req.user._id;
   const ID = req.params.contactId;
-  const { contact } = await upsertContact(ID, req.body);
+
+  const contact = await upsertContact({ _id: ID, userId }, req.body);
+
+  if (!contact) {
+    return res.status(404).json({ status: 404, message: 'Contact not found' });
+  }
 
   res.status(200).json({
     status: 200,
@@ -63,9 +81,11 @@ export const patchContactController = async (req, res) => {
 };
 
 export const putContactController = async (req, res) => {
+  const userId = req.user._id;
   const ID = req.params.contactId;
   const body = req.body;
-  const { contact, isNew } = await upsertContact(ID, body, {
+
+  const { contact, isNew } = await upsertContact({ _id: ID, userId }, body, {
     upsert: true,
   });
 
@@ -78,12 +98,13 @@ export const putContactController = async (req, res) => {
 };
 
 export const deleteContactByIdController = async (req, res, next) => {
+  const userId = req.user._id;
   const id = req.params.contactId;
 
-  const contact = await getContactById(id);
+  const contact = await getContactById({ _id: id, userId });
 
   if (!contact) {
-    next(isHttpError(404, 'not found'));
+    next(isHttpError(404, 'Not found'));
     return;
   }
 
