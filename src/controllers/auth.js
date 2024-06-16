@@ -29,7 +29,7 @@ export const loginUserController = async (req, res) => {
 
   res.json({
     status: 200,
-    message: 'Successfully logged in an user!',
+    message: 'User successfully logged in!',
     data: {
       accessToken: session.accessToken,
     },
@@ -46,7 +46,7 @@ export const logoutUserController = async (req, res) => {
   res.clearCookie('sessionId');
   res.status(204).json({
     status: 204,
-    message: 'Successfully logged out an user!',
+    message: 'User successfully logged out!',
   });
 };
 
