@@ -7,8 +7,11 @@ import { loginUserSchema } from '../validation/auth.js';
 import { loginUserController } from '../controllers/auth.js';
 import { logoutUserController } from '../controllers/auth.js';
 import { refreshSessionController } from '../controllers/auth.js';
+import cookieParser from 'cookie-parser';
 
 const authRouter = Router();
+
+authRouter.use(cookieParser());
 
 authRouter.post(
   '/register',

@@ -67,6 +67,7 @@ export const refreshSessionController = async (req, res) => {
     req.cookies.sessionId,
     req.cookies.refreshToken,
   );
+
   setupSession(res, session);
   res.json({
     status: 200,
