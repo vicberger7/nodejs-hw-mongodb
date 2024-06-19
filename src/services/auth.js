@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { User } from '../db/models/user.js';
 import bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
+import crypto from 'crypto';
 import { FIFTEEN_MINUTES, THIRTY_DAYS } from '../constants/index.js';
 import { Session } from '../db/models/session.js';
 
@@ -34,9 +34,9 @@ export const loginUser = async (payload) => {
 
   await Session.deleteOne({ userId: user._id });
 
-  const accessToken = randomBytes(30).toString('base64');
+  const accessToken = crypto.randomBytes(30).toString('base64');
 
-  const refreshToken = randomBytes(30).toString('base64');
+  const refreshToken = crypto.randomBytes(30).toString('base64');
 
   return await Session.create({
     userId: user._id,
@@ -55,8 +55,8 @@ export const logoutUser = async ({ sessionId, sessionToken }) => {
 };
 
 const createSession = () => {
-  const accessToken = randomBytes(30).toString('base64');
-  const refreshToken = randomBytes(30).toString('base64');
+  const accessToken = crypto.randomBytes(30).toString('base64');
+  const refreshToken = crypto.randomBytes(30).toString('base64');
 
   return {
     accessToken,
@@ -66,7 +66,7 @@ const createSession = () => {
   };
 };
 
-export const refreshSession = async (sessionId, refreshToken) => {
+export const refreshSession = async ({ sessionId, refreshToken }) => {
   const session = await Session.findOne({
     _id: sessionId,
     refreshToken,
@@ -85,7 +85,10 @@ export const refreshSession = async (sessionId, refreshToken) => {
   const newSession = createSession();
 
   await Session.deleteOne({ _id: session._id, refreshToken });
-  await Session.create({ ...newSession, userId: session.userId });
+  await Session.create({
+    userId: session.userId,
+    ...newSession,
+  });
 
   return newSession;
 };

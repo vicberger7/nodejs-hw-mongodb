@@ -19,17 +19,45 @@ export const loginUserController = async (req, res) => {
 
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
-    expires: new Date(Date.now() + FIFTEEN_MINUTES),
+    expires: new Date(Date.now() + THIRTY_DAYS),
   });
 
   res.cookie('sessionId', session._id, {
     httpOnly: true,
-    expires: new Date(Date.now() + THIRTY_DAYS),
+    expires: new Date(Date.now() + FIFTEEN_MINUTES),
   });
 
   res.json({
     status: 200,
     message: 'User successfully logged in!',
+    data: {
+      accessToken: session.accessToken,
+    },
+  });
+};
+
+const setupSession = (res, session) => {
+  res.cookie('refreshToken', session.refreshToken, {
+    httpOnly: true,
+    expires: new Date(Date.now() + THIRTY_DAYS),
+  });
+
+  res.cookie('sessionId', session._id, {
+    httpOnly: true,
+    expires: new Date(Date.now() + FIFTEEN_MINUTES),
+  });
+};
+
+export const refreshSessionController = async (req, res) => {
+  const session = await refreshSession({
+    sessionId: req.cookies.sessionId,
+    refreshToken: req.cookies.refreshToken,
+  });
+
+  setupSession(res, session);
+  res.json({
+    status: 200,
+    message: 'Successfully refreshed session!',
     data: {
       accessToken: session.accessToken,
     },
@@ -47,31 +75,5 @@ export const logoutUserController = async (req, res) => {
   res.status(204).json({
     status: 204,
     message: 'User successfully logged out!',
-  });
-};
-
-const setupSession = (res, session) => {
-  res.cookie('refreshToken', session.refreshToken, {
-    httpOnly: true,
-    expires: new Date(Date.now() + FIFTEEN_MINUTES),
-  });
-
-  res.cookie('sessionId', session._id, {
-    httpOnly: true,
-    expires: new Date(Date.now() + THIRTY_DAYS),
-  });
-};
-
-export const refreshSessionController = async (req, res) => {
-  const session = await refreshSession(
-    req.cookies.sessionId,
-    req.cookies.refreshToken,
-  );
-
-  setupSession(res, session);
-  res.json({
-    status: 200,
-    message: 'Successfully refreshed session!',
-    data: session,
   });
 };
