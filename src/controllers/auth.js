@@ -37,6 +37,7 @@ export const loginUserController = async (req, res) => {
 };
 
 const setupSession = (res, session) => {
+  console.log(session);
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
     expires: new Date(Date.now() + THIRTY_DAYS),
@@ -55,6 +56,7 @@ export const refreshSessionController = async (req, res) => {
   });
 
   setupSession(res, session);
+
   res.json({
     status: 200,
     message: 'Successfully refreshed session!',
