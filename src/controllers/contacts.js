@@ -19,6 +19,7 @@ export const getContactsController = async (req, res) => {
   filter.userId = userId;
 
   const contacts = await getAllContacts({
+    userId,
     page,
     perPage,
     sortBy,
@@ -57,6 +58,8 @@ export const getContactByIdController = async (req, res) => {
       .json({ status: error.status, message: 'Contact not found' });
   }
 };
+
+//
 
 export const createContactController = async (req, res) => {
   const userId = req.user._id;

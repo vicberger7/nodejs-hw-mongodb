@@ -4,27 +4,29 @@ import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
 
 export const getAllContacts = async ({
+  userId,
   page = 1,
   perPage = 5,
   sortBy = 'id',
   sortOrder = SORT_ORDER.ASC,
   filter = {},
 }) => {
-  const contactsFilter = Contact.find();
+  const contactsFilter = { userId };
+
+  const contactsQuery = Contact.find(contactsFilter);
 
   if (filter.isFavorite) {
-    contactsFilter.where('isFavorite').equals(filter.isFavorite);
+    contactsQuery.where('isFavorite').equals(filter.isFavorite);
   }
 
   const limit = perPage;
   const skip = perPage * (page - 1);
 
-  const contactsQuery = Contact.find();
   const contactsCount = await Contact.find()
     .merge(contactsQuery)
     .countDocuments();
 
-  const contacts = await contactsQuery
+  const contacts = await Contact.find(contactsFilter)
     .skip(skip)
     .limit(limit)
     .sort({ [sortBy]: sortOrder })
@@ -68,7 +70,6 @@ export const upsertContact = async (
   if (!rawResult || !rawResult.value) {
     throw createHttpError(404, 'Contact not found');
   }
-
   return {
     contact: rawResult.value,
     isNew: !rawResult?.lastErrorObject?.updatedExisting,
