@@ -1,6 +1,11 @@
 import { Schema, model } from 'mongoose';
 
 const contactSchema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
   name: {
     type: String,
     required: true,
@@ -23,6 +28,7 @@ const contactSchema = new Schema({
     required: true,
     default: 'personal',
   },
+
   createdAt: {
     type: Date,
     default: Date.now,
