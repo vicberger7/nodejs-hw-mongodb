@@ -7,6 +7,11 @@ import { loginUserSchema } from '../validation/auth.js';
 import { loginUserController } from '../controllers/auth.js';
 import { logoutUserController } from '../controllers/auth.js';
 import { refreshSessionController } from '../controllers/auth.js';
+import { requestResetPasswordEmailSchema } from '../validation/auth.js';
+import { requestResetPasswordEmailController } from '../controllers/auth.js';
+import { resetPasswordSchema } from '../validation/auth.js';
+import { resetPasswordController } from '../controllers/auth.js';
+
 import cookieParser from 'cookie-parser';
 
 const authRouter = Router();
@@ -28,5 +33,17 @@ authRouter.post(
 authRouter.post('/logout', ctrlWrapper(logoutUserController));
 
 authRouter.post('/refresh', ctrlWrapper(refreshSessionController));
+
+authRouter.post(
+  '/request-reset-password-email',
+  validateBody(requestResetPasswordEmailSchema),
+  ctrlWrapper(requestResetPasswordEmailController),
+);
+
+authRouter.post(
+  '/reset-password',
+  validateBody(resetPasswordSchema),
+  ctrlWrapper(resetPasswordController),
+);
 
 export default authRouter;

@@ -2,6 +2,9 @@ import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
+// import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { saveFile } from '../utils/saveFile.js';
 
 export const getAllContacts = async ({
   userId,
@@ -49,23 +52,34 @@ export const getContactById = async ({ _id, userId }) => {
   return contact;
 };
 
-export const createContact = async (payload) => {
-  const newContact = new Contact(payload);
+export const createContact = async ({ photo, ...payload }) => {
+  // const url = await saveFileToUploadDir(photo);
+  const url = await saveFileToCloudinary(photo);
+
+  const newContact = await Contact.create({
+    ...payload,
+    photoUrl: url,
+  });
+
   return await newContact.save();
 };
 
 export const upsertContact = async (
   { _id: ID, userId },
-  body,
+  { photo, ...body },
   options = {},
 ) => {
-  console.log(body);
-  const rawResult = await Contact.findByIdAndUpdate({ _id: ID, userId }, body, {
-    new: true,
-    includeResultMetadata: true,
-    ...options,
-  });
-  console.log(rawResult);
+  const url = await saveFile(photo);
+
+  const rawResult = await Contact.findByIdAndUpdate(
+    { _id: ID, userId },
+    { ...body, photoUrl: url },
+    {
+      new: true,
+      includeResultMetadata: true,
+      ...options,
+    },
+  );
 
   if (!rawResult || !rawResult.value) {
     throw createHttpError(404, 'Contact not found');

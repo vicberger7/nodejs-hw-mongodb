@@ -13,6 +13,7 @@ import { validateBody } from '../middlewares/validateBody.js';
 import { validateMongoId } from '../middlewares/validateMongoId.js';
 import { createContactSchema } from '../validation/createContacts.js';
 import { updateContactSchema } from '../validation/updateContact.js';
+import { upload } from '../middlewares/multer.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
 const contactsRouter = Router();
@@ -27,17 +28,24 @@ contactsRouter.get('/:contactId', ctrlWrapper(getContactByIdController));
 
 contactsRouter.post(
   '',
+  upload.single('photo'),
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
 
 contactsRouter.patch(
   '/:contactId',
+  upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(patchContactController),
 );
 
-contactsRouter.put('/:contactId', ctrlWrapper(putContactController));
+contactsRouter.put(
+  '/:contactId',
+  upload.single('photo'),
+  validateBody(updateContactSchema),
+  ctrlWrapper(putContactController),
+);
 
 contactsRouter.delete('/:contactId', ctrlWrapper(deleteContactByIdController));
 

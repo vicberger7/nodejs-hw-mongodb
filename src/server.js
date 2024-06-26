@@ -6,6 +6,7 @@ import { env } from './utils/env.js';
 import { ENV_VARS } from './constants/index.js';
 import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js';
 import { notFoundMiddleware } from './middlewares/notFoundHandlerMiddleware.js';
+import { UPLOAD_DIR } from './constants/index.js';
 import cookieParser from 'cookie-parser';
 
 export const setupServer = () => {
@@ -16,6 +17,8 @@ export const setupServer = () => {
   app.use(cookieParser());
 
   app.use(cors());
+
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
   app.use(
     pino({
