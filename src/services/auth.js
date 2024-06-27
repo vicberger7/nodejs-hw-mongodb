@@ -167,4 +167,10 @@ export const resetPassword = async (payload) => {
   const encryptedPassword = await bcrypt.hash(payload.password, 10);
 
   await User.updateOne({ _id: user._id }, { password: encryptedPassword });
+
+  return {
+    status: 200,
+    message: 'Password has been successfully reset.',
+    data: {},
+  };
 };
