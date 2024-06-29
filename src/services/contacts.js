@@ -3,7 +3,7 @@ import { Contact } from '../db/models/contact.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
 // import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
-import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+// import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 import { saveFile } from '../utils/saveFile.js';
 
 export const getAllContacts = async ({
@@ -53,8 +53,7 @@ export const getContactById = async ({ _id, userId }) => {
 };
 
 export const createContact = async ({ photo, ...payload }) => {
-  // const url = await saveFileToUploadDir(photo);
-  const url = await saveFileToCloudinary(photo);
+  const url = await saveFile(photo);
 
   const newContact = await Contact.create({
     ...payload,

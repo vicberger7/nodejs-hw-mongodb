@@ -63,8 +63,6 @@ export const getContactByIdController = async (req, res) => {
   }
 };
 
-//
-
 export const createContactController = async (req, res) => {
   const userId = req.user._id;
   const { body, file } = req;
@@ -91,7 +89,9 @@ export const patchContactController = async (req, res) => {
   if (photo) {
     if (env(ENV_VARS.IS_CLOUDINARY_ENABLED) === 'true') {
       photoUrl = await saveFileToCloudinary(photo);
-    } else photoUrl = await saveFileToUploadDir(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
   }
 
   const result = await upsertContact(
@@ -103,16 +103,19 @@ export const patchContactController = async (req, res) => {
     return res.status(404).json({ status: 404, message: 'Contact not found' });
   }
 
-  const contact = await upsertContact({ _id: ID, userId }, { ...body, photo });
+  // const contact = await upsertContact(
+  //   { _id: ID, userId },
+  //   { ...body, photo: photoUrl },
+  // );
 
-  if (!contact) {
-    return res.status(404).json({ status: 404, message: 'Contact not found' });
-  }
+  // if (!contact) {
+  //   return res.status(404).json({ status: 404, message: 'Contact not found' });
+  // }
 
   res.status(200).json({
     status: 200,
     message: `Successfully patched contact`,
-    data: result.contact,
+    data: result,
   });
 };
 

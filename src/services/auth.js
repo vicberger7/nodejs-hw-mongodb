@@ -59,6 +59,11 @@ export const logoutUser = async ({ sessionId, sessionToken }) => {
     _id: sessionId,
     refreshToken: sessionToken,
   });
+
+  return {
+    status: 204,
+    message: 'User successfully logged out!',
+  };
 };
 
 const createSession = () => {
