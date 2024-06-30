@@ -2,8 +2,7 @@ import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
-// import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
-// import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+
 import { saveFile } from '../utils/saveFile.js';
 
 export const getAllContacts = async ({
