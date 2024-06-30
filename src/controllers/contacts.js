@@ -9,6 +9,10 @@ import { isHttpError } from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilters } from '../utils/parseFilters.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { ENV_VARS } from '../constants/index.js';
+import { env } from '../utils/env.js';
 
 export const getContactsController = async (req, res) => {
   const userId = req.user._id;
@@ -59,12 +63,11 @@ export const getContactByIdController = async (req, res) => {
   }
 };
 
-//
-
 export const createContactController = async (req, res) => {
   const userId = req.user._id;
+  const { body, file } = req;
 
-  const newContactData = { ...req.body, userId };
+  const newContactData = { ...body, photo: file, userId };
   const newContact = await createContact(newContactData);
 
   res.status(201).json({
@@ -78,27 +81,47 @@ export const patchContactController = async (req, res) => {
   const userId = req.user._id;
   const ID = req.params.contactId;
 
-  const contact = await upsertContact({ _id: ID, userId }, req.body);
+  const body = req.body;
+  const photo = req.file;
 
-  if (!contact) {
+  let photoUrl;
+
+  if (photo) {
+    if (env(ENV_VARS.IS_CLOUDINARY_ENABLED) === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+
+  const result = await upsertContact(
+    { _id: ID, userId },
+    { ...body, photoUrl },
+  );
+
+  if (!result) {
     return res.status(404).json({ status: 404, message: 'Contact not found' });
   }
 
   res.status(200).json({
     status: 200,
-    message: `Successfully created contact`,
-    data: contact,
+    message: `Successfully patched contact`,
+    data: result,
   });
 };
 
 export const putContactController = async (req, res) => {
   const userId = req.user._id;
   const ID = req.params.contactId;
-  const body = req.body;
+  const { body, file } = req.body;
 
-  const { contact, isNew } = await upsertContact({ _id: ID, userId }, body, {
-    upsert: true,
-  });
+  const { contact, isNew } = await upsertContact(
+    { _id: ID, userId },
+    { ...body, photo: file },
+    {
+      upsert: true,
+    },
+  );
 
   const status = isNew ? 201 : 200;
   res.status(status).json({

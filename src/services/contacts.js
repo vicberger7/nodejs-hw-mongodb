@@ -3,6 +3,8 @@ import { Contact } from '../db/models/contact.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
 
+import { saveFile } from '../utils/saveFile.js';
+
 export const getAllContacts = async ({
   userId,
   page = 1,
@@ -49,31 +51,32 @@ export const getContactById = async ({ _id, userId }) => {
   return contact;
 };
 
-export const createContact = async (payload) => {
-  const newContact = new Contact(payload);
+export const createContact = async ({ photo, ...payload }) => {
+  const url = await saveFile(photo);
+
+  const newContact = await Contact.create({
+    ...payload,
+    photoUrl: url,
+  });
+
   return await newContact.save();
 };
 
 export const upsertContact = async (
   { _id: ID, userId },
-  body,
+  payload,
   options = {},
 ) => {
-  console.log(body);
-  const rawResult = await Contact.findByIdAndUpdate({ _id: ID, userId }, body, {
-    new: true,
-    includeResultMetadata: true,
-    ...options,
-  });
-  console.log(rawResult);
+  const rawResult = await Contact.findOneAndUpdate(
+    { _id: ID, userId },
+    payload,
+    {
+      new: true,
 
-  if (!rawResult || !rawResult.value) {
-    throw createHttpError(404, 'Contact not found');
-  }
-  return {
-    contact: rawResult.value,
-    isNew: !rawResult?.lastErrorObject?.updatedExisting,
-  };
+      ...options,
+    },
+  );
+  return rawResult;
 };
 
 export const deleteContactById = async ({ _id, userId }) => {

@@ -1,6 +1,7 @@
 import Joi from 'joi';
 
 export const updateContactSchema = Joi.object({
+  photoUrl: Joi.string(),
   name: Joi.string().min(3).max(20),
   phoneNumber: Joi.string().min(3).max(20),
   email: Joi.string().email().min(3).max(20),
