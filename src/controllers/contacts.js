@@ -96,21 +96,12 @@ export const patchContactController = async (req, res) => {
 
   const result = await upsertContact(
     { _id: ID, userId },
-    { ...body, photo: photoUrl },
+    { ...body, photoUrl },
   );
 
   if (!result) {
     return res.status(404).json({ status: 404, message: 'Contact not found' });
   }
-
-  // const contact = await upsertContact(
-  //   { _id: ID, userId },
-  //   { ...body, photo: photoUrl },
-  // );
-
-  // if (!contact) {
-  //   return res.status(404).json({ status: 404, message: 'Contact not found' });
-  // }
 
   res.status(200).json({
     status: 200,

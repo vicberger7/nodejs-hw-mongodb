@@ -65,28 +65,19 @@ export const createContact = async ({ photo, ...payload }) => {
 
 export const upsertContact = async (
   { _id: ID, userId },
-  { photo, ...body },
+  payload,
   options = {},
 ) => {
-  const url = await saveFile(photo);
-
-  const rawResult = await Contact.findByIdAndUpdate(
+  const rawResult = await Contact.findOneAndUpdate(
     { _id: ID, userId },
-    { ...body, photoUrl: url },
+    payload,
     {
       new: true,
-      includeResultMetadata: true,
+
       ...options,
     },
   );
-
-  if (!rawResult || !rawResult.value) {
-    throw createHttpError(404, 'Contact not found');
-  }
-  return {
-    contact: rawResult.value,
-    isNew: !rawResult?.lastErrorObject?.updatedExisting,
-  };
+  return rawResult;
 };
 
 export const deleteContactById = async ({ _id, userId }) => {
