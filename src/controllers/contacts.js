@@ -5,7 +5,7 @@ import {
   deleteContactById,
   upsertContact,
 } from '../services/contacts.js';
-import { isHttpError } from 'http-errors';
+
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilters } from '../utils/parseFilters.js';
@@ -131,18 +131,10 @@ export const putContactController = async (req, res) => {
   });
 };
 
-export const deleteContactByIdController = async (req, res, next) => {
-  const userId = req.user._id;
+export const deleteContactByIdController = async (req, res) => {
   const id = req.params.contactId;
-
-  const contact = await getContactById({ _id: id, userId });
-
-  if (!contact) {
-    next(isHttpError(404, 'Not found'));
-    return;
-  }
 
   await deleteContactById(id);
 
-  res.status(204).send();
+  res.status(204).send(204, 'User deleted');
 };

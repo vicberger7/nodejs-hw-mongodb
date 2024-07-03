@@ -1,0 +1,75 @@
+tags:
+  - Contacts
+summary: Create a new contact
+operationId: createContact
+description: Create a new contact
+security:
+  - bearerAuth: []
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required:
+          - name
+          - phoneNumber
+          - email
+          - isFavorite
+          - contactType
+        properties:
+          name:
+            description: "Contact's name"
+            type: string
+          phoneNumber:
+            description: "Contact's phone number"
+            type: string
+          email:
+            description: "Contact's email"
+            type: string
+          isFavorite:
+            description: 'True if contact is favorite'
+            type: boolean
+          contactType:
+            description: "Contact's type"
+            type: string
+            enum: ['work', 'home', 'personal']
+          photo:
+            description: Contact's photo file (*.jpg, *.png)
+            type: string
+            format: binary
+      encoding:
+        photo:
+          contentType: image/*
+      examples:
+        example1:
+          summary: Example with photo
+          value:
+            name: Viktor
+            phoneNumber: '12345'
+            email: email@example.com
+            isFavorite: true
+            contactType: work
+            photo: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMVF...'
+    application/json:
+      schema:
+        type: object
+        $ref: '../../components/schemas/contact.yaml'
+responses:
+  '201':
+    description: Successfully created a contact
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: Successfully created a contact
+            data:
+              type: object
+              $ref: '../../components/schemas/contactDB.yaml'
+  '401':
+    $ref: '../../components/responses/401.yaml'
