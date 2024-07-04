@@ -31,7 +31,7 @@ requestBody:
           contactType:
             type: string
             enum: ['work', 'home', 'personal']
-          photoUrl:
+          photo:
             description: Contact's photo file (*.jpg, *.png, etc.)
             type: string
             format: binary
@@ -43,8 +43,8 @@ requestBody:
           summary: Example with photo
           value:
             phoneNumber: '+3809999999'
-            email: isidora_duncan@ui.com
-            photoUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMVF...'
+            email: isa@ui.com
+            photo: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMVF...'
     application/json:
       schema:
         type: object
@@ -54,7 +54,7 @@ requestBody:
             example: '+3809999999'
           email:
             type: string
-            example: 'isidora_duncan@ui.com'
+            example: 'dunc@ui.com'
 responses:
   '200':
     description: Contact updated successfully
