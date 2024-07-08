@@ -11,10 +11,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000"
-    },
-    {
-      "url": "https://example.com/api/v1"
+      "url": "https://contacts-app6.onrender.com"
     }
   ],
   "tags": [
@@ -305,10 +302,7 @@
                 "type": "object",
                 "required": [
                   "name",
-                  "phoneNumber",
-                  "email",
-                  "isFavorite",
-                  "contactType"
+                  "phoneNumber"
                 ],
                 "properties": {
                   "name": {
