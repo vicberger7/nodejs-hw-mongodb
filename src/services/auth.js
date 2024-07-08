@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import { User } from '../db/models/user.js';
 import bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 import crypto from 'crypto';
 import { FIFTEEN_MINUTES, THIRTY_DAYS } from '../constants/index.js';
 import { Session } from '../db/models/session.js';
@@ -11,6 +12,10 @@ import { ENV_VARS, TEMPLATES_DIR } from '../constants/index.js';
 import handlebars from 'handlebars';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import {
+  getFullNameFromGoogleTokenPayload,
+  validateCode,
+} from '../utils/googleOAuth2.js';
 
 export const registerUser = async (payload) => {
   const user = await User.findOne({ email: payload.email });
@@ -178,4 +183,28 @@ export const resetPassword = async (payload) => {
     message: 'Password has been successfully reset.',
     data: {},
   };
+};
+
+export const loginOrSignupWithGoogle = async (code) => {
+  const loginTicket = await validateCode(code);
+  const payload = loginTicket.getPayload();
+  if (!payload) throw createHttpError(401);
+
+  let user = await User.findOne({ email: payload.email });
+  if (!user) {
+    const password = await bcrypt.hash(randomBytes(10), 10);
+    user = await User.create({
+      email: payload.email,
+      name: getFullNameFromGoogleTokenPayload(payload),
+      password,
+      role: 'parent',
+    });
+  }
+
+  const newSession = createSession();
+
+  return await Session.create({
+    userId: user._id,
+    ...newSession,
+  });
 };

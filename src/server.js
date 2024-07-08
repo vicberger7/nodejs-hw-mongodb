@@ -8,9 +8,12 @@ import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js'
 import { notFoundMiddleware } from './middlewares/notFoundHandlerMiddleware.js';
 import { UPLOAD_DIR } from './constants/index.js';
 import cookieParser from 'cookie-parser';
+import { swagger } from './middlewares/swagger.js';
 
 export const setupServer = () => {
   const app = express();
+
+  app.use('/api-docs', swagger());
 
   app.use(express.json());
 

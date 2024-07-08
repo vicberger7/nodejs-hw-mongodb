@@ -79,12 +79,7 @@ export const upsertContact = async (
   return rawResult;
 };
 
-export const deleteContactById = async ({ _id, userId }) => {
-  const contact = await Contact.findByIdAndDelete({ _id, userId });
-
-  if (!contact) {
-    throw createHttpError(404, 'Contact not found');
-  }
-
+export const deleteContactById = async (id) => {
+  const contact = await Contact.findByIdAndDelete(id);
   return contact;
 };
